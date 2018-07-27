@@ -405,3 +405,80 @@ make.height.equalTo(@(80));
 *（1）size约束（可能会出现约束异常）：make.size.equalTo(self.view);
 *（2）edges约束（建议使用此方法）：make.edges.equalTo(self.view);
 
+
+Masonry基础使用
+Masonry基础API:
+mas_makeConstraints() 添加约束
+mas_remakeConstraints() 移除之前的约束，重新添加新的约束
+mas_updateConstraints() 更新约束
+equalTo() 参数是对象类型，一般是视图对象或者mas_width这样的坐标系对象
+mas_equalTo() 和上面功能相同，参数可以传递基础数据类型对象，可以理解为比上面的API更强大
+width() 用来表示宽度，例如代表view的宽度
+mas_width() 用来获取宽度的值。和上面的区别在于，一个代表某个坐标系对象，一个用来获取坐标系对象的值
+equalTo 和 mas_equalTo的区别
+
+> #define mas_equalTo(...)  equalTo(MASBoxValue((__VA_ARGS__)))
+#define mas_greaterThanOrEqualTo(...)  greaterThanOrEqualTo(MASBoxValue((__VA_ARGS__)))
+#define mas_lessThanOrEqualTo(...)  lessThanOrEqualTo(MASBoxValue((__VA_ARGS__)))
+#define mas_offset(...)  valueOffset(MASBoxValue((__VA_ARGS__)))
+
+
+由上面可以得出:mas_equalTo只是对其参数进行了一个Boxing
+(装箱) 操作，目前支持的类型：数值类型（NSNumber）、点（CGPoint）、大小（CGSize）、边距（UIEdgeInsets），基本数据类型
+，而equalTo:这个方法不会对参数进行包装。
+Auto Boxing
+上面例如equalTo或者width这样的，有时候需要涉及到使用mas_前缀，这在开发中需要注意作区分。
+如果在当前类引入#import "Masonry.h"之前，用下面两种宏定义声明一下，就不需要区分mas_前缀。
+
+> //1. 对于约束参数可以省去"mas_"
+#define  MAS_SHORTHAND
+//2. 对于默认的约束参数自动装箱
+#define  MAS_SHORTHAND_GLOBALS
+
+原因在于Masonry内部有以下宏定义
+
+> #ifdef MAS_SHORTHAND_GLOBALS
+#define equalTo(...)  mas_equalTo(__VA_ARGS__)
+#define greaterThanOrEqualTo(...)   mas_greaterThanOrEqualTo(__VA_ARGS__)
+#define lessThanOrEqualTo(...)  mas_lessThanOrEqualTo(__VA_ARGS__)
+#define offset(...)  mas_offset(__VA_ARGS__)
+#endif
+
+
+约束的属性
+在此仅罗列几个不常见的
+>@property (nonatomic, strong, readonly) MASConstraint *leading; //首部
+@property (nonatomic, strong, readonly) MASConstraint *trailing; //尾部
+@property (nonatomic, strong, readonly) MASConstraint *baseline; //文本基线
+
+
+约束的三种方法
+
+>// 这个方法只会添加新的约束
+[grayView mas_makeConstraints:^(MASConstraintMaker *make) {
+
+}];
+// 这个方法会将以前的所有约束删掉，添加新的约束
+[grayView mas_updateConstraints:^(MASConstraintMaker *make) {
+
+}];
+// 这个方法将会覆盖以前的某些特定的约束，重新设置新的约束
+[grayView mas_remakeConstraints:^(MASConstraintMaker *make) {
+
+}];
+
+
+常见约束类型
+
+1.尺寸：width、height、size 
+2.边界：left、leading、right、trailing、top、bottom 
+3.中心点：center、centerX、centerY 
+4.边界：edges 
+5.偏移量：offset、insets、sizeOffset、centerOffset 
+6.priority()约束优先级（0~1000），multipler乘因数,dividedBy除因数
+
+
+原文链接：
+https://www.jianshu.com/p/78179ae77d75
+
+
